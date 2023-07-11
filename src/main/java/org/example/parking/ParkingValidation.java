@@ -1,16 +1,28 @@
 package org.example.parking;
 
 import org.example.car.Car;
-import org.example.exception.ErrorDetails;
-import org.example.exception.InvalidExtensionHours;
-import org.example.exception.InvalidSumException;
-import org.example.exception.WeightOverMaximumException;
+import org.example.car.CarBrand;
+import org.example.car.CarType;
+import org.example.exception.*;
 import org.example.utils.AppConstants;
+
+import java.util.List;
 
 public class ParkingValidation {
     public static void validateCarAttributes(Car car){
         if(car.getCarWeight() > AppConstants.MAX_WEIGHT) {
             throw new WeightOverMaximumException(ErrorDetails.UNSUPPORTED_WEIGHT.getName(), AppConstants.MAX_WEIGHT);
+        }
+        List<CarType> carTypes = List.of(CarType.values());
+        if(!carTypes.contains(car.getCarType())){
+            throw new UnsupportedCarTypeException(ErrorDetails.UNSUPPORTED_CAR_TYPE.getName(),
+                    car.getCarType().getName());
+        }
+        List<CarBrand> carBrands = List.of(CarBrand.values());
+        if(!carBrands.contains(car.getCarBrand())){
+            throw new UnsupportedCarBrandException(
+                    ErrorDetails.UNSUPPORTED_CAR_BRAND.getName(), car.getCarBrand().getName()
+            );
         }
     }
 

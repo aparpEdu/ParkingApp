@@ -1,34 +1,27 @@
 package org.example.parking;
 
-import org.example.exception.ErrorDetails;
+import org.example.car.Car;
 import org.example.exception.ResourceNotFoundException;
-import org.example.exception.UnsupportedCarBrandException;
-import org.example.exception.UnsupportedCarTypeException;
 import org.example.utils.AppConstants;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
 public class ParkingManager {
-    public ParkedCar addCarToParkingRegister(ParkedCar car){
-        ParkingValidation.validateCarAttributes(car.getCar());
-        try {
-            Parking.getInstance().getParkedCars().add(car);
-        }
-      catch (UnsupportedCarTypeException exception) {
-            throw new UnsupportedCarTypeException (
-                            ErrorDetails.UNSUPPORTED_CAR_TYPE.getName(),
-                            car.getCar().getCarType().getName()
-                    );
-      }catch (UnsupportedCarBrandException unsupportedCarBrandException) {
-            throw new UnsupportedCarBrandException(
-                ErrorDetails.UNSUPPORTED_CAR_BRAND.getName(), car.getCar().getCarBrand().getName()
-            );
-        }
+    public static ParkedCar addCarToParkingRegister(Car car, int hoursParked) {
+        ParkingValidation.validateCarAttributes(car);
+        ParkingValidation.validateTimeExtension(hoursParked);
+        ParkedCar carToPark = new ParkedCar();
+        carToPark.setCar(car);
+        carToPark.setFee(AppConstants.STANDARD_FEE * hoursParked);
+        carToPark.setDueTime(LocalDateTime.now().plusHours(hoursParked));
+        Parking.getInstance().getParkedCars().add(carToPark);
         System.out.println(AppConstants.SUCCESSFUL_PARKING);
-        return car;
+        return carToPark;
     }
 
-    public void removeCarFromParkingRegister(String licensePlate){
+    public static void removeCarFromParkingRegister(String licensePlate){
         Set <ParkedCar> parkedCars = Parking.getInstance().getParkedCars();
         Optional<ParkedCar> carToRemove = parkedCars.stream()
                 .filter(parkedCar -> parkedCar.getCar().getLicensePlate().equalsIgnoreCase(licensePlate))
