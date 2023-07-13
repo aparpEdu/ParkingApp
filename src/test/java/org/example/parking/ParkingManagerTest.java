@@ -5,7 +5,7 @@ import org.example.car.CarBrand;
 import org.example.car.CarType;
 import org.example.exception.ErrorDetails;
 import org.example.exception.InvalidExtensionHours;
-import org.example.exception.UnsupportedCarTypeException;
+import org.example.exception.ResourceNotFoundException;
 import org.example.exception.WeightOverMaximumException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +28,7 @@ class ParkingManagerTest {
         carToPark.setLicensePlate("B 7777 BB");
         carToPark.setColor("BLUE");
         parkedCars = Parking.getInstance().getParkedCars();
+        ParkingManager.addCarToParkingRegister(carToPark, 2);
     }
 
     @Test
@@ -99,6 +100,19 @@ class ParkingManagerTest {
     }
 
     @Test
-    void removeCarFromParkingRegister() {
+    void carShouldBeRemovedFromParkingLotWhenGivenCorrectLicensePlate() {
+        int initialNumberOfParkedCars = parkedCars.size();
+        ParkingManager.removeCarFromParkingRegister(carToPark.getLicensePlate());
+        int numberOfParkedCarsAfterRemovingACar = parkedCars.size();
+        assertNotEquals(initialNumberOfParkedCars, numberOfParkedCarsAfterRemovingACar);
+    }
+
+    @Test
+    void carShouldNotBeRemovedFromParkingLotWhenGivenIncorrectLicensePlate() {
+        String incorrectLicensePlate = "DDD 343";
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> ParkingManager.removeCarFromParkingRegister(incorrectLicensePlate)
+        );
     }
 }
